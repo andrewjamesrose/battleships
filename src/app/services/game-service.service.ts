@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Boat, ICoord } from '../models+constants/boats';
+import {
+  Boat,
+  ICoord,
+  IGameTile,
+  UP,
+  generateExcludedCoordSet,
+} from '../models+constants/boats';
 import {
   GAME_BOAT_LIST,
   GAME_GRID_DIMENSION,
@@ -14,11 +20,15 @@ export class GameService {
   freeTiles: ICoord[] = [];
   excludedTiles: ICoord[] = [];
   boatList: Boat[] = [];
+  gameTiles: IGameTile[] = [];
 
   initialiseNewGame(): void {
     this.freeTiles = generateFullGrid(GAME_GRID_DIMENSION);
     this.excludedTiles = [];
+    this.gameTiles = [];
+    this.boatList = [];
     this.generateBoatSet();
+    this.gameTiles = this.generateGameTiles(this.boatList);
   }
 
   isBoatValid(newBoat: Boat): boolean {
@@ -62,11 +72,10 @@ export class GameService {
         if (this.isBoatValid(newBoat)) {
           this.boatList.push(newBoat);
           this.movePointSetToExclusions(newBoat.getCoordinateSet());
-          // generate exclusions
 
-          // move boat coordinates to the exclusion list
-
-          //
+          this.movePointSetToExclusions(generateExcludedCoordSet(newBoat));
+          // generate exclusions and move those
+          // to be implemented
           boatAddedSuccessfully = true;
         }
       }
@@ -76,15 +85,60 @@ export class GameService {
   getBoatList(): Boat[] {
     return this.boatList;
   }
+
+  generateGameTiles(boatList: Boat[]): IGameTile[] {
+    let displayedTiles: IGameTile[] = [];
+
+    for (let boat of boatList) {
+      for (let tile of boat.getCoordinateSet()) {
+        let nextTile: IGameTile = {
+          coord: tile,
+          direction: UP,
+          displayed: true,
+          identity: 'midsection',
+        };
+        displayedTiles.push(nextTile);
+      }
+    }
+    return displayedTiles;
+  }
+
+  checkClass(coord: ICoord): string {
+    let populatedTiles: ICoord[] = this.gameTiles.map((tile) => tile.coord);
+
+    if (isCoordinateInCoordSet(coord, populatedTiles)) {
+      return 'boat';
+    } else {
+      return '';
+    }
+  }
 }
 
-function isInBounds(coordSet: ICoord[]): boolean {
+export function isInBounds(coordSet: ICoord[]): boolean {
   for (let coord of coordSet) {
-    if (coord.x < 0 || coord.y < 0) {
+    if (
+      coord.x < 1 ||
+      coord.y < 1 ||
+      coord.x > GAME_GRID_DIMENSION ||
+      coord.y > GAME_GRID_DIMENSION
+    ) {
       return false;
     }
   }
   return true;
+}
+
+export function isCoordInBounds(coord: ICoord): boolean {
+  if (
+    coord.x < 1 ||
+    coord.y < 1 ||
+    coord.x > GAME_GRID_DIMENSION ||
+    coord.y > GAME_GRID_DIMENSION
+  ) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 export function generateFullGrid(gridSize: number): ICoord[] {

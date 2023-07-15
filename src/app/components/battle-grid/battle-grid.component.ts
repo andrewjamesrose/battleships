@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Boat } from 'src/app/models+constants/boats';
+import { GAME_GRID_DIMENSION } from 'src/app/models+constants/gameConstants';
 import {
   GameService,
   generateFullGrid,
@@ -13,10 +14,8 @@ import {
 export class BattleGridComponent {
   constructor(private gameService: GameService) {}
 
-  testClick(): void {
-    // let testBoat = new Boat({ x: 5, y: 6 }, 1);
-    // console.log(generateFullGrid(10));
-  }
+  gridDimension = GAME_GRID_DIMENSION;
+  gridDummyArray = this.createRange(this.gridDimension);
 
   printBoatList(): void {
     console.log(this.gameService.getBoatList());
@@ -24,5 +23,14 @@ export class BattleGridComponent {
 
   newGame(): void {
     this.gameService.initialiseNewGame();
+  }
+
+  createRange(input: number) {
+    // return new Array(number);
+    return new Array(input).fill(0).map((n, index) => index + 1);
+  }
+
+  getClass(x: number, y: number): string {
+    return this.gameService.checkClass({ x: x, y: y });
   }
 }

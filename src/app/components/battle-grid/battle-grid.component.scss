@@ -1,0 +1,21 @@
+table {
+  border-spacing: 0px;
+  border-collapse: collapse;
+  border: 1px solid black;
+}
+
+tr {
+  height: 40px;
+}
+
+td {
+  border-spacing: 25px;
+  border-collapse: collapse;
+  border: 1px solid black;
+  width: 40px;
+  overflow: hidden;
+}
+
+.boat {
+  background-color: black;
+}

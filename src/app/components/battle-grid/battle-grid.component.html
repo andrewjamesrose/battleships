@@ -2,14 +2,20 @@
 
 <button (click)="printBoatList()">Print Boat List</button>
 
+<button (click)="printGameTiles()">Print Game Tiles</button>
+
 <table>
   <ng-container *ngFor="let y of gridDummyArray">
     <tr>
       <ng-container *ngFor="let x of gridDummyArray">
-        <!-- <td [ngClass]="getClass(x, y)">({{ x }}, {{ y }})</td> -->
-        <td [ngClass]="getClass(x, y)"></td>
+        <td [ngClass]="getClass(x, y)" class="gameTile"></td>
       </ng-container>
+      <td class="clue">{{ getRowCount(y) }}</td>
     </tr>
-    <!-- <tr *ngFor="let item of group.items"><td>{{item}}</td></tr> -->
   </ng-container>
+  <tr>
+    <ng-container *ngFor="let x of gridDummyArray">
+      <td class="clue">{{ getColCount(x) }}</td>
+    </ng-container>
+  </tr>
 </table>

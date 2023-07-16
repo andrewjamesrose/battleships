@@ -3,12 +3,13 @@ import {
   Boat,
   ICoord,
   IGameTile,
-  UP,
   generateExcludedCoordSet,
 } from '../models+constants/boats';
 import {
   GAME_BOAT_LIST,
   GAME_GRID_DIMENSION,
+  MAX_CLUES,
+  MIN_CLUES,
 } from '../models+constants/gameConstants';
 
 @Injectable({
@@ -21,6 +22,7 @@ export class GameService {
   excludedTiles: ICoord[] = [];
   boatList: Boat[] = [];
   gameTiles: IGameTile[] = [];
+  visibleClues: number = -1;
 
   initialiseNewGame(): void {
     this.freeTiles = generateFullGrid(GAME_GRID_DIMENSION);
@@ -28,6 +30,7 @@ export class GameService {
     this.gameTiles = [];
     this.boatList = [];
     this.generateBoatSet();
+    this.visibleClues = randomIntFromInterval(MIN_CLUES, MAX_CLUES);
     this.gameTiles = this.generateGameTiles(this.boatList);
   }
 
@@ -93,9 +96,9 @@ export class GameService {
       for (let tile of boat.getCoordinateSet()) {
         let nextTile: IGameTile = {
           coord: tile,
-          direction: UP,
+          direction: boat.direction,
           displayed: true,
-          identity: 'midsection',
+          identity: boat.getComponentDisplayClass(tile),
         };
         displayedTiles.push(nextTile);
       }
@@ -104,13 +107,38 @@ export class GameService {
   }
 
   checkClass(coord: ICoord): string {
-    let populatedTiles: ICoord[] = this.gameTiles.map((tile) => tile.coord);
+    let populatedTileCoords: ICoord[] = this.gameTiles.map(
+      (tile) => tile.coord
+    );
 
-    if (isCoordinateInCoordSet(coord, populatedTiles)) {
-      return 'boat';
-    } else {
-      return '';
+    for (let gameTile of this.gameTiles) {
+      if (gameTile.coord.x === coord.x && gameTile.coord.y === coord.y) {
+        if (gameTile.displayed === true) {
+          return gameTile.identity;
+        }
+      }
     }
+
+    return '';
+  }
+
+  elementCount(index: number, direction: 'row' | 'column'): number {
+    let elementCount: number = 0;
+
+    for (let boat of this.boatList) {
+      for (let coord of boat.getCoordinateSet()) {
+        if (direction === 'row') {
+          if (coord.y === index) {
+            elementCount += 1;
+          }
+        } else {
+          if (coord.x === index) {
+            elementCount += 1;
+          }
+        }
+      }
+    }
+    return elementCount;
   }
 }
 
@@ -153,7 +181,10 @@ export function generateFullGrid(gridSize: number): ICoord[] {
   return newGrid;
 }
 
-function isCoordinateInCoordSet(coord: ICoord, coordSet: ICoord[]): boolean {
+export function isCoordinateInCoordSet(
+  coord: ICoord,
+  coordSet: ICoord[]
+): boolean {
   for (let listElement of coordSet) {
     if (coord.x === listElement.x && coord.y === listElement.y) {
       return true;
@@ -164,4 +195,8 @@ function isCoordinateInCoordSet(coord: ICoord, coordSet: ICoord[]): boolean {
 
 function randomCoordFromSet(coordSet: ICoord[]): ICoord {
   return coordSet[Math.floor(Math.random() * coordSet.length)];
+}
+
+function randomIntFromInterval(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }

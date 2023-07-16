@@ -21,6 +21,10 @@ export class BattleGridComponent {
     console.log(this.gameService.getBoatList());
   }
 
+  printGameTiles(): void {
+    console.log(this.gameService.gameTiles);
+  }
+
   newGame(): void {
     this.gameService.initialiseNewGame();
   }
@@ -32,5 +36,13 @@ export class BattleGridComponent {
 
   getClass(x: number, y: number): string {
     return this.gameService.checkClass({ x: x, y: y });
+  }
+
+  getColCount(index: number): number {
+    return this.gameService.elementCount(index, 'column');
+  }
+
+  getRowCount(index: number): number {
+    return this.gameService.elementCount(index, 'row');
   }
 }

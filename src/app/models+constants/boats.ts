@@ -1,12 +1,16 @@
-import { isCoordInBounds, isInBounds } from '../services/game-service.service';
+import {
+  isCoordInBounds,
+  isCoordinateInCoordSet,
+  isInBounds,
+} from '../services/game-service.service';
 
 export interface ICoord {
   x: number;
   y: number;
 }
 
-export const UP: ICoord = { x: 0, y: 1 };
-export const DOWN: ICoord = { x: 0, y: -1 };
+export const UP: ICoord = { x: 0, y: -1 };
+export const DOWN: ICoord = { x: 0, y: 1 };
 export const LEFT: ICoord = { x: -1, y: 0 };
 export const RIGHT: ICoord = { x: 1, y: 0 };
 
@@ -14,13 +18,22 @@ export type Direction = typeof UP | typeof DOWN | typeof LEFT | typeof RIGHT;
 
 const DIRECTION_ARRAY: Direction[] = [UP, DOWN, LEFT, RIGHT];
 
-export type BoatComponent = 'stern' | 'midsection' | 'bow';
+export type BoatComponent = 'stern' | 'midsection' | 'bow' | 'mono';
+
+export type ComponentDisplayClass =
+  | 'end-up'
+  | 'end-down'
+  | 'end-right'
+  | 'end-left'
+  | 'midsection'
+  | 'mono'
+  | '';
 
 export type Tile = BoatComponent | 'excluded' | 'blank';
 
 export interface IGameTile {
   coord: ICoord;
-  identity: Tile;
+  identity: ComponentDisplayClass;
   displayed: boolean;
   direction: Direction;
 }
@@ -61,6 +74,51 @@ export class Boat implements IBoat {
     }
 
     return outputCoordSet;
+  }
+
+  getComponentDisplayClass(coord: ICoord): ComponentDisplayClass {
+    let boatCoords = this.getCoordinateSet();
+
+    for (let [index, boatCoord] of boatCoords.entries()) {
+      if (coord.x === boatCoord.x && coord.y === boatCoord.y) {
+        if (index === 0 && this.length === 1) {
+          return 'mono';
+        } else if (index === 0) {
+          switch (this.direction) {
+            case UP: {
+              return 'end-down';
+            }
+            case DOWN: {
+              return 'end-up';
+            }
+            case LEFT: {
+              return 'end-right';
+            }
+            case RIGHT: {
+              return 'end-left';
+            }
+          }
+        } else if (index === this.length - 1) {
+          switch (this.direction) {
+            case UP: {
+              return 'end-up';
+            }
+            case DOWN: {
+              return 'end-down';
+            }
+            case LEFT: {
+              return 'end-left';
+            }
+            case RIGHT: {
+              return 'end-right';
+            }
+          }
+        } else {
+          return 'midsection';
+        }
+      }
+    }
+    return '';
   }
 }
 

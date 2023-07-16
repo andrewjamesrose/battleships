@@ -1,10 +1,7 @@
 import { Component } from '@angular/core';
 import { Boat } from 'src/app/models+constants/boats';
 import { GAME_GRID_DIMENSION } from 'src/app/models+constants/gameConstants';
-import {
-  GameService,
-  generateFullGrid,
-} from 'src/app/services/game-service.service';
+import { GameService } from 'src/app/services/game-service.service';
 
 @Component({
   selector: 'battle-grid',
@@ -14,8 +11,14 @@ import {
 export class BattleGridComponent {
   constructor(private gameService: GameService) {}
 
+  ngOnInit() {
+    this.gameService.initialiseNewGame();
+    this.solutionCode = this.gameService.solutionCode;
+  }
+
   gridDimension = GAME_GRID_DIMENSION;
   gridDummyArray = this.createRange(this.gridDimension);
+  solutionCode: string = '';
 
   printBoatList(): void {
     console.log(this.gameService.getBoatList());
@@ -25,8 +28,17 @@ export class BattleGridComponent {
     console.log(this.gameService.gameTiles);
   }
 
+  enableGameMode(): void {
+    this.gameService.enableGameMode();
+  }
+
+  enableSolutionMode(): void {
+    this.gameService.answerMode();
+  }
+
   newGame(): void {
     this.gameService.initialiseNewGame();
+    this.solutionCode = this.gameService.solutionCode;
   }
 
   createRange(input: number) {
@@ -44,5 +56,9 @@ export class BattleGridComponent {
 
   getRowCount(index: number): number {
     return this.gameService.elementCount(index, 'row');
+  }
+
+  getSolutionCode(): string {
+    return this.getSolutionCode();
   }
 }

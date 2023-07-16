@@ -4,6 +4,10 @@
 
 <button (click)="printGameTiles()">Print Game Tiles</button>
 
+<button (click)="enableGameMode()">Game Mode</button>
+
+<button (click)="enableSolutionMode()">Show Solution</button>
+
 <table>
   <ng-container *ngFor="let y of gridDummyArray">
     <tr>
@@ -19,3 +23,5 @@
     </ng-container>
   </tr>
 </table>
+
+<div>Solution Code: {{ solutionCode | uppercase }}</div>

@@ -36,6 +36,7 @@ export interface IGameTile {
   identity: ComponentDisplayClass;
   displayed: boolean;
   direction: Direction;
+  isClue: Boolean;
 }
 
 export interface IBoat {

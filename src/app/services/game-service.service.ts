@@ -3,9 +3,11 @@ import {
   Boat,
   ICoord,
   IGameTile,
+  UP,
   generateExcludedCoordSet,
 } from '../models+constants/boats';
 import {
+  CIPHER_BLOCK_OFFSET,
   GAME_BOAT_LIST,
   GAME_GRID_DIMENSION,
   MAX_CLUES,
@@ -216,12 +218,15 @@ export class GameService {
       }
       outputString =
         outputString +
-        binToBase36WithOffset(rowString, SOLUTION_OFFSET) +
+        binToBase36WithOffset(rowString, getRowCipher(y - 1)) +
         (y < 10 ? '-' : '');
     }
 
-    // outputString = binToBase36(outputString);
     return outputString;
+  }
+
+  codeToSolutionGrid(solutionCode: string): void {
+    this.gameTiles = codeToGrid(solutionCode);
   }
 }
 
@@ -313,6 +318,14 @@ function binToBase36WithOffset(
   return tempvalue.toString(36);
 }
 
+function base36WithOffsetToTenBitBin(
+  base36String: string,
+  offsetDecimal: number
+): string {
+  let tempvalue: number = parseInt(base36String, 36) - offsetDecimal;
+  return tempvalue.toString(2).padStart(10, '0');
+}
+
 function gridToCode(tenBitBinArray: string[]): string {
   let outputString: string = '';
 
@@ -321,4 +334,53 @@ function gridToCode(tenBitBinArray: string[]): string {
   }
 
   return outputString;
+}
+
+function binToBoolean(binValue: string): boolean {
+  if (binValue === '1') {
+    return true;
+  }
+  return false;
+}
+
+function codeToGrid(solutionCode: string): IGameTile[] {
+  let gridGameTiles: IGameTile[] = [];
+
+  let base36Strings: string[] = solutionCode.split('-');
+
+  let index: number = 0;
+
+  for (const [rowNumber, base36String] of base36Strings.entries()) {
+    let binString = base36WithOffsetToTenBitBin(
+      base36String,
+      getRowCipher(rowNumber)
+    );
+    // console.log(rowNumber);
+    console.log(binString);
+    let binCharArray = binString.split('');
+    for (let binChar of binCharArray) {
+      if (binToBoolean(binChar)) {
+        let newGameTile: IGameTile = {
+          coord: {
+            x: (index % GAME_GRID_DIMENSION) + 1,
+            y: Math.floor(index / GAME_GRID_DIMENSION) + 1,
+          },
+          direction: UP,
+          displayed: binToBoolean(binChar),
+          identity: 'midsection',
+          isClue: true,
+        };
+        gridGameTiles.push(newGameTile);
+      }
+      index += 1;
+    }
+  }
+
+  return gridGameTiles;
+}
+
+function getRowCipher(rowNumber: number): number {
+  console.log(SOLUTION_OFFSET + rowNumber * CIPHER_BLOCK_OFFSET);
+  return SOLUTION_OFFSET + rowNumber * CIPHER_BLOCK_OFFSET;
+  // return SOLUTION_OFFSET;
 }

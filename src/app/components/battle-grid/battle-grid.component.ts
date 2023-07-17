@@ -36,13 +36,17 @@ export class BattleGridComponent {
     this.gameService.answerMode();
   }
 
+  testShowSolution(): void {
+    let solutionString = '27-1J-AG-AG-A7-AS-33-1N-MN-1I';
+    this.gameService.codeToSolutionGrid(solutionString);
+  }
+
   newGame(): void {
     this.gameService.initialiseNewGame();
     this.solutionCode = this.gameService.solutionCode;
   }
 
   createRange(input: number) {
-    // return new Array(number);
     return new Array(input).fill(0).map((n, index) => index + 1);
   }
 

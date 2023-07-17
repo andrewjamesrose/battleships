@@ -7,3 +7,5 @@ export const MIN_CLUES = 4;
 export const MAX_CLUES = 6;
 
 export const SOLUTION_OFFSET = 47;
+
+export const CIPHER_BLOCK_OFFSET = 7;

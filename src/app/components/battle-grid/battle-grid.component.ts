@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Boat } from 'src/app/models+constants/boats';
 import { GAME_GRID_DIMENSION } from 'src/app/models+constants/gameConstants';
 import { GameService } from 'src/app/services/game-service.service';
@@ -9,13 +10,20 @@ import { GameService } from 'src/app/services/game-service.service';
   styleUrls: ['./battle-grid.component.scss'],
 })
 export class BattleGridComponent {
-  constructor(private gameService: GameService) {}
+  constructor(private gameService: GameService, private activatedRoute: ActivatedRoute) {
+    if(this.activatedRoute.snapshot.url.length > 0){
+        if(this.activatedRoute.snapshot.url[0].path === 'develop'){
+            this.developMode = true
+        }
+    }
+  }
 
   ngOnInit() {
     this.gameService.initialiseNewGame();
     this.solutionCode = this.gameService.solutionCode;
   }
 
+  developMode: boolean = false
   gridDimension = GAME_GRID_DIMENSION;
   gridDummyArray = this.createRange(this.gridDimension);
   solutionCode: string = '';

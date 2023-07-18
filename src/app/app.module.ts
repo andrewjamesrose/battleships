@@ -8,6 +8,7 @@ import { SolutionsComponent } from './components/solutions/solutions.component';
 
 const appRoutes: Routes = [
   { path: '', component: BattleGridComponent },
+  { path: 'develop', component: BattleGridComponent },
   { path: 'solution', component: SolutionsComponent },
   { path: 'solution/:solutionCode', component: SolutionsComponent },
   { path: '**', redirectTo: '' },
